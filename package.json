@@ -20,6 +20,7 @@
     "build:sol": "waffle .waffle.json",
     "build:vy": "bash ./compileUniswap.sh",
     "build:types": "typechain --target ethers-v4 --outDir build/types 'build/*.json'",
+    "build:truegold": "waffle .waffle-truegold.json",
     "build": "yarn clean && yarn build:sol && yarn build:aave && yarn build:vy && yarn build:types && bash ./indexBuild.sh",
     "test:js": "./test.sh",
     "test:ts": "mocha",

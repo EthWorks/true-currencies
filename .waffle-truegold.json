@@ -1,0 +1,11 @@
+{
+  "compilerType": "native",
+  "compilerOptions": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 20000
+    }
+  },
+  "sourceDirectory": "./contracts/trueGold",
+  "outputDirectory": "./build"
+}
