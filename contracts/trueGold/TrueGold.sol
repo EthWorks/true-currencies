@@ -5,9 +5,8 @@ import "../trueCurrencies/TrueCoinReceiver.sol";
 import "../registry/Registry.sol";
 import "../trueCurrencies/ReclaimerToken.sol";
 import "../trueCurrencies/BurnableTokenWithBounds.sol";
-import "../trueCurrencies/GasRefundToken.sol";
 
-abstract contract TrueGold is ReclaimerToken, RegistryClone, BurnableTokenWithBounds, GasRefundToken {
+abstract contract TrueGold is ReclaimerToken, RegistryClone, BurnableTokenWithBounds {
     bytes32 constant IS_REGISTERED_CONTRACT = "isRegisteredContract";
     bytes32 constant IS_DEPOSIT_ADDRESS = "isDepositAddress";
     uint256 constant REDEMPTION_ADDRESS_COUNT = 0x100000;
@@ -50,18 +49,6 @@ abstract contract TrueGold is ReclaimerToken, RegistryClone, BurnableTokenWithBo
         _requireOnlyCanBurn(_to);
         require(_value >= burnMin, "below min burn bound");
         require(_value <= burnMax, "exceeds max burn bound");
-        if (0 == _subBalance(_from, _value)) {
-            if (0 != _subAllowance(_from, _spender, _value)) {
-                gasRefund15();
-            }
-            // else no refund
-        } else {
-            if (0 == _subAllowance(_from, _spender, _value)) {
-                gasRefund15();
-            } else {
-                gasRefund39();
-            }
-        }
         emit Transfer(_from, _to, _value);
         totalSupply_ = totalSupply_.sub(_value);
         emit Burn(_to, _value);
@@ -77,11 +64,6 @@ abstract contract TrueGold is ReclaimerToken, RegistryClone, BurnableTokenWithBo
         _requireOnlyCanBurn(_to);
         require(_value >= burnMin, "below min burn bound");
         require(_value <= burnMax, "exceeds max burn bound");
-        if (0 == _subBalance(_from, _value)) {
-            gasRefund15();
-        } else {
-            gasRefund30();
-        }
         emit Transfer(_from, _to, _value);
         totalSupply_ = totalSupply_.sub(_value);
         emit Burn(_to, _value);
@@ -102,33 +84,6 @@ abstract contract TrueGold is ReclaimerToken, RegistryClone, BurnableTokenWithBo
 
         (address finalTo, bool hasHook) = _requireCanTransferFrom(_spender, _from, _to);
 
-        if (0 == _addBalance(finalTo, _value)) {
-            if (0 == _subAllowance(_from, _spender, _value)) {
-                if (0 != _subBalance(_from, _value)) {
-                    gasRefund30();
-                }
-                // else do not refund
-            } else {
-                if (0 == _subBalance(_from, _value)) {
-                    gasRefund30();
-                } else {
-                    gasRefund39();
-                }
-            }
-        } else {
-            if (0 == _subAllowance(_from, _spender, _value)) {
-                if (0 != _subBalance(_from, _value)) {
-                    gasRefund15();
-                }
-                // else do not refund
-            } else {
-                if (0 == _subBalance(_from, _value)) {
-                    gasRefund15();
-                } else {
-                    gasRefund39();
-                }
-            }
-        }
         emit Transfer(_from, _to, _value);
 
         if (finalTo != _to) {
@@ -158,18 +113,6 @@ abstract contract TrueGold is ReclaimerToken, RegistryClone, BurnableTokenWithBo
 
         (address finalTo, bool hasHook) = _requireCanTransfer(_from, _to);
 
-        if (0 == _subBalance(_from, _value)) {
-            if (0 == _addBalance(finalTo, _value)) {
-                gasRefund30();
-            }
-            // else do not refund
-        } else {
-            if (0 == _addBalance(finalTo, _value)) {
-                gasRefund39();
-            } else {
-                gasRefund30();
-            }
-        }
         emit Transfer(_from, _to, _value);
 
         if (finalTo != _to) {
